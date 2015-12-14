@@ -170,12 +170,18 @@ server {
 	{{ end }}
 
 	location / {
+	        {{ if (exists (printf "/etc/nginx/vhost.d/%s_override_location" $host)) }}
+	        # proxy_pass must be defined in the overide_location file
+	        {{ else }}
 		proxy_pass {{ trim $proto }}://{{ trim $host }};
+	        {{ end }}
 		{{ if (exists (printf "/etc/nginx/htpasswd/%s" $host)) }}
 		auth_basic	"Restricted {{ $host }}";
 		auth_basic_user_file	{{ (printf "/etc/nginx/htpasswd/%s" $host) }};
 		{{ end }}
-                {{ if (exists (printf "/etc/nginx/vhost.d/%s_location" $host)) }}
+		{{ if (exists (printf "/etc/nginx/vhost.d/%s_override_location" $host)) }}
+                include {{ printf "/etc/nginx/vhost.d/%s_override_location" $host}};
+                {{ else if (exists (printf "/etc/nginx/vhost.d/%s_location" $host)) }}
                 include {{ printf "/etc/nginx/vhost.d/%s_location" $host}};
                 {{ else if (exists "/etc/nginx/vhost.d/default_location") }}
                 include /etc/nginx/vhost.d/default_location;
