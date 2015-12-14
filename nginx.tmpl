@@ -171,7 +171,7 @@ server {
 
 	location / {
 	        {{ if (exists (printf "/etc/nginx/vhost.d/%s_override_location" $host)) }}
-	        # proxy_pass must be defined in the overide_location file
+	        # proxy_pass must be defined in the override_location file
 	        {{ else }}
 		proxy_pass {{ trim $proto }}://{{ trim $host }};
 	        {{ end }}
